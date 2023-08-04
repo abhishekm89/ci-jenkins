@@ -24,13 +24,7 @@ pipeline {
     stages {
         stage ('BUILD') {
             steps {
-                sh 'mvn -s settings.xml install' 
-            }
-            //post {
-            //    success {
-            //        echo " *** Archiving Artifact ***"
-            //        archiveArtifact artifacts: '**/*.war'
-            //    }
+                sh 'mvn -s settings.xml' 
             }
         }
         stage ('UNIT TEST') {
