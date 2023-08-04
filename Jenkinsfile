@@ -26,11 +26,11 @@ pipeline {
             steps {
                 sh 'mvn -s settings.xml install' 
             }
-            post {
-                success {
-                    echo " *** Archiving Artifact ***"
-                    archiveArtifact artifacts: '**/*.war'
-                }
+            //post {
+            //    success {
+            //        echo " *** Archiving Artifact ***"
+            //        archiveArtifact artifacts: '**/*.war'
+            //    }
             }
         }
         stage ('UNIT TEST') {
