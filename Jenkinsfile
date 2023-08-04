@@ -20,6 +20,22 @@ pipeline {
             steps {
                 sh 'mvn -s settings.xml' 
             }
+            post {
+                success {
+                    echo " *** Archiving Artifact ***"
+                    archiveArtifact artifacts: '**/*.war'
+                }
+            }
+        }
+        stage ('UNIT TEST') {
+            steps {
+                sh 'mvn test'
+            }
+        }
+        stage ('CHECKSTYLE ANALYSIS') {
+            steps {
+                sh 'mvn checkstyle:checkstyle'
+            }
         }
     }
 }
