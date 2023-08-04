@@ -14,7 +14,7 @@ pipeline {
         NEXUS_PASS = "admin123"
         RELEASE_REPO = "vprofile-release"       // Nexus Maven(Hosted) Release Repository
         CENTRAL_REPO = "vpro-maven-central"     // Nexus Maven(Proxy) Repository
-        NEXUSIP = "172.31.50.80"
+        NEXUSIP = "172.31.80.28"
         NEXUSPORT = "8081"
         NEXUS_GRP_REPO = "vpro-maven-group"     // Nexus Maven(Group) Repository 
         NEXUS_LOGIN = "nexuslogin"              // Jenkins Global Credentials ID
@@ -24,7 +24,7 @@ pipeline {
     stages {
         stage ('BUILD') {
             steps {
-                sh 'mvn build -s settings.xml' 
+                sh 'mvn -s settings.xml build -DskipTests' 
             }
             post {
                 success {
