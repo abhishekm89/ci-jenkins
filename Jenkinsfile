@@ -24,7 +24,7 @@ pipeline {
     stages {
         stage ('BUILD') {
             steps {
-                sh 'mvn -s settings.xml' 
+                sh 'mvn install -s settings.xml' 
             }
         }
         stage ('UNIT TEST') {
