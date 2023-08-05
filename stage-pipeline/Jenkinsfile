@@ -20,11 +20,14 @@ pipeline {
         NEXUS_LOGIN = "nexuslogin"              // Jenkins Global Credentials ID
         SONARSERVER = "sonarserver"
         SONARSCANNER = "sonarscanner"
+        registryCredential = "ecr:us-east-1:awscreds"
+        appRegistry = "555340816576.dkr.ecr.us-east-1.amazonaws.com/vprofileappimg"
+        vprofileRegistry = "https://555340816576.dkr.ecr.us-east-1.amazonaws.com"
     }
     stages {
         stage ('BUILD') {
             steps {
-                sh 'mvn -s settings.xml install' 
+                sh 'mvn -s settings.xml install -DskipTests' 
             }
         }
         stage ('UNIT TEST') {
@@ -80,6 +83,24 @@ pipeline {
                         type: 'war']
                     ]
                 )
+            }
+        }
+        stage ('BUILD APP IMAGE') {
+            steps {
+                script {
+                    dockerImage = docker.build(appRegistry + ":$BUILD_NUMBER", "./Docker-files/app/multistage")
+                }
+
+            }
+        }
+        stage('UPLOAD APP IMAGE') {
+            steps {
+                script {
+                    docker.withRegistry( vprofileRegistry, registryCredential ) {
+                        dockerImage.push("$BUILD_NUMBER")
+                        dockerImage.push('latest')
+                    }
+                }
             }
         }
     }
