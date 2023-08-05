@@ -1,6 +1,6 @@
 FROM openjdk:8 AS BUILD_IMAGE
 RUN apt update && apt install maven -y
-RUN git clone -b cicd-jenkins https://github.com/abhishekm89/cicd-jenkins.git
+RUN git clone -b cicd-jenkins git@github.com:abhishekm89/cicd-jenkins.git
 RUN cd cicd-jenkins && mvn install
 
 FROM tomcat:8-jre11
