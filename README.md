@@ -1,5 +1,7 @@
 #### AUTHOR: ABHISHEK MAGAJI ####
 #### Complete CI/CD Pipeline ####
+
+GIT > FETCH > JENKINS > BUILD > UNIT/INTEGRATION TEST > QUALITYGATES > NEXUSARTIFACT > DOCKER APP IMAGE > ECR > ECS
 ### Prerequisites
 - JDK 1.8 or later
 - Maven 3 or later
