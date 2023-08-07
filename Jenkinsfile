@@ -21,9 +21,9 @@ pipeline {
         SONARSERVER = "sonarserver"
         SONARSCANNER = "sonarscanner"
         ARTIFACT_NAME = "vprofile-v${BUILD_ID}.war"
-        AWS_S3_BUCKET = 'vprofile-cicd-beanstalk'
-        AWS_EB_APP_NAME = 'vproapp'
-        AWS_EB_ENVIRONMENT = 'Vproapp-env'
+        AWS_S3_BUCKET = 'vprofile-cicd-beanstalk'       // S3 Bucket Name
+        AWS_EB_APP_NAME = 'vproapp'                     // ElasticBeanstalk Application Name
+        AWS_EB_ENVIRONMENT = 'Vproapp-env'              // ElasticBeanstalk Environment Name
         AWS_EB_APP_VERSION = "${BUILD_ID}"
     }
     stages {
