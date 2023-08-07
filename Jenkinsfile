@@ -4,93 +4,40 @@ def COLOR_MAP = [
 ]
 pipeline {
     agent any
-    tools {
-        maven "MAVEN3"
-        jdk "OracleJDK8"
-    }
     environment {
-        SNAP_REPO = "vprofile-repo"             // Nexus Maven(Hosted) Snapshot Repository
         NEXUS_USER = "admin"
         NEXUS_PASS = "admin123"
         RELEASE_REPO = "vprofile-release"       // Nexus Maven(Hosted) Release Repository
-        CENTRAL_REPO = "vpro-maven-central"     // Nexus Maven(Proxy) Repository
         NEXUSIP = "172.31.80.28"
-        NEXUSPORT = "8081"
-        NEXUS_GRP_REPO = "vpro-maven-group"     // Nexus Maven(Group) Repository 
-        NEXUS_LOGIN = "nexuslogin"              // Jenkins Global Credentials ID
-        SONARSERVER = "sonarserver"
-        SONARSCANNER = "sonarscanner"
         NEXUSPASS = credentials('nexuspass')    // Secret Text stored in JenkinsCredentials (admin123)
     }                                           // Because we just need password. NEXUS_PASS -> uname_and_pass
     stages {
-        stage ('BUILD') {
+        stage ('SETUP PARAMETERS') {
             steps {
-                sh 'mvn -s settings.xml install' 
-            }
-        }
-        stage ('UNIT TEST') {
-            steps {
-                sh 'mvn -s settings.xml test'
-            }
-        }
-        stage ('CHECKSTYLE ANALYSIS') {
-            steps {
-                sh 'mvn -s settings.xml checkstyle:checkstyle'
-            }
-        }
-        stage ('SONARQUBE - CODE ANALYSIS') {
-            environment {
-                scannerHome = tool "${SONARSCANNER}"
-            }
-            steps {
-                withSonarQubeEnv("${SONARSERVER}") {
-                    sh '''${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=vprofile \
-                    -Dsonar.projectName=vprofile \
-                    -Dsonar.projectVersion=1.0 \
-                    -Dsonar.sources=src/ \
-                    -Dsonar.java.binaries=target/test-classes/com/visualpathit/account/controllerTest/ \
-                    -Dsonar.junit.reportsPath=target/surefire-reports/ \
-                    -Dsonar.jacoco.reportsPath=target/jacoco.exec \
-                    -Dsonar.java.checkstyle.reportPaths=target/checkstyle-result.xml'''
+                script {
+                    properties ([
+                        Parameters ([
+                            string (
+                                defaultValue: '',
+                                name: 'BUILD',
+                            ),
+                            string (
+                                defaultValue: '',
+                                name: 'TIME',
+                            )
+                        ])
+                    ])
                 }
             }
         }
-        stage ('QUALITY GATE') {
-            steps {
-                timeout(time: 1, unit: 'HOURS') {
-                    // Parameter indicates whether to set pipeline to UNSTABLE if Quality Gate fails
-                    // true = set pipeline to UNSTABLE, false = don't
-                    waitForQualityGate abortPipeline: true
-                }
-            }
-        }
-        stage ('UPLOAD ARTIFACT') {
-            steps {
-                nexusArtifactUploader(
-                    nexusVersion: 'nexus3',
-                    protocol: 'http',
-                    nexusUrl: "${NEXUSIP}:${NEXUSPORT}",
-                    groupId: 'QA',
-                    version: "${env.BUILD_ID}-${env.BUILD_TIMESTAMP}",
-                    repository: "${RELEASE_REPO}",
-                    credentialsId: "${NEXUS_LOGIN}",
-                    artifacts: [
-                        [artifactId: 'vproapp',
-                        classifier: '',
-                        file: 'target/vprofile-v2.war',
-                        type: 'war']
-                    ]
-                )
-            }
-        }
-        stage ('ANSIBLE DEPLOY TO STAGING') {
+        stage ('ANSIBLE DEPLOY TO PRODUCTION') {
             steps {
                 ansiblePlaybook([
                 inventory   : 'ansible/stage.inventory',
                 playbook    : 'ansible/site.yml',
                 installation: 'ansible',
                 colorized   : true,
-			    credentialsId: 'applogin',      // AppServer(tomcat) EC2 AccessKeys saved in Jenkins Credentials
+			    credentialsId: 'applogin-prod',      // AppServer(tomcat) EC2 AccessKeys saved in Jenkins Credentials
 			    disableHostKeyChecking: true,
                 extraVars   : [
                    	USER: "${NEXUS_USER}",
@@ -98,10 +45,10 @@ pipeline {
 			        nexusip: "${NEXUSIP}",               
 			        reponame: "${RELEASE_REPO}",
 			        groupid: "QA",
-			        time: "${env.BUILD_TIMESTAMP}",
-			        build: "${env.BUILD_ID}",
+			        time: "${env.TIME}",            // "TIME" Variable dont exist. Need to take as argument from user
+			        build: "${env.BUILD}",          // "BUILD" Variable dont exist. Need to take as argument from user
                     artifactid: "vproapp",
-			        vprofile_version: "vproapp-${env.BUILD_ID}-${env.BUILD_TIMESTAMP}.war"
+			        vprofile_version: "vproapp-${env.BUILD}-${env.TIME}.war"
                     ]
                 ])
 
