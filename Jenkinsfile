@@ -33,7 +33,7 @@ pipeline {
         stage ('ANSIBLE DEPLOY TO PRODUCTION') {
             steps {
                 ansiblePlaybook([
-                inventory   : 'ansible/stage.inventory',
+                inventory   : 'ansible/prod.inventory',
                 playbook    : 'ansible/site.yml',
                 installation: 'ansible',
                 colorized   : true,
