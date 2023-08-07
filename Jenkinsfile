@@ -24,7 +24,7 @@ pipeline {
         AWS_S3_BUCKET = 'vprofile-cicd-beanstalk'       // S3 Bucket Name
         AWS_EB_APP_NAME = 'vproapp'                     // ElasticBeanstalk Application Name
         AWS_EB_ENVIRONMENT = 'Vproapp-env'              // ElasticBeanstalk Environment Name
-        AWS_EB_APP_VERSION = "${BUILD_ID}"
+        AWS_EB_APP_VERSION = "vpro-artifact-v${BUILD_ID}"
     }
     stages {
         stage ('BUILD') {
