@@ -1,5 +1,5 @@
 #### AUTHOR: ABHISHEK MAGAJI ####
-#### Created from CI-JENKINS ####
+#### Created from CICD-JENKINS-BEANSTALK-PRODUCTION ####
 ### Prerequisites
 - JDK 1.8 or later
 - Maven 3 or later
