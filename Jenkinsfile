@@ -20,7 +20,8 @@ pipeline {
         NEXUS_LOGIN = "nexuslogin"              // Jenkins Global Credentials ID
         SONARSERVER = "sonarserver"
         SONARSCANNER = "sonarscanner"
-    }
+        NEXUSPASS = credentials('nexuspass')    // Secret Text stored in JenkinsCredentials (admin123)
+    }                                           // Because we just need password. NEXUS_PASS -> uname_and_pass
     stages {
         stage ('BUILD') {
             steps {
@@ -80,6 +81,30 @@ pipeline {
                         type: 'war']
                     ]
                 )
+            }
+        }
+        stage ('ANSIBLE DEPLOY TO STAGING') {
+            steps {
+                ansiblePlaybook([
+                inventory   : 'ansible/stage.inventory',
+                playbook    : 'ansible/site.yml',
+                installation: 'ansible',
+                colorized   : true,
+			    credentialsId: 'applogin',      // AppServer(tomcat) EC2 AccessKeys saved in Jenkins Credentials
+			    disableHostKeyChecking: true,
+                extraVars   : [
+                   	USER: "${NEXUS_USER}",
+                    PASS: "${NEXUSPASS}",
+			        nexusip: "${NEXUSIP}",               
+			        reponame: "${RELEASE_REPO}",
+			        groupid: "QA",
+			        time: "${env.BUILD_TIMESTAMP}",
+			        build: "${env.BUILD_ID}",
+                    artifactid: "vproapp",
+			        vprofile_version: "vproapp-${env.BUILD_ID}-${env.BUILD_TIMESTAMP}.war"
+                    ]
+                ])
+
             }
         }
     }
