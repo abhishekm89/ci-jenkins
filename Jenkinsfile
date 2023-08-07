@@ -20,6 +20,11 @@ pipeline {
         NEXUS_LOGIN = "nexuslogin"              // Jenkins Global Credentials ID
         SONARSERVER = "sonarserver"
         SONARSCANNER = "sonarscanner"
+        ARTIFACT_NAME = "vprofile-v${BUILD_ID}.war"
+        AWS_S3_BUCKET = 'vprofile-cicd-beanstalk'
+        AWS_EB_APP_NAME = 'vproapp'
+        AWS_EB_ENVIRONMENT = 'Vproapp-env'
+        AWS_EB_APP_VERSION = "${BUILD_ID}"
     }
     stages {
         stage ('BUILD') {
